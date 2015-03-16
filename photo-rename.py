@@ -59,7 +59,7 @@ def main():
         print(imageFile + ' --> ' + opts.destdir + '/' + newFileName)
 
     try:
-        shutil.move(imageFile, newFileName)
+        shutil.move(imageFile, opts.destdir + '/' + newFileName)
     except Exception as e:
         sys.stderr.write('An IO error occurred: %s\n' % e)
         sys.exit(1)
