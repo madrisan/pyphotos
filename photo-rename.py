@@ -13,7 +13,8 @@ options = \
         version = "%prog v1",
         usage = '%prog /path/to/the/photo',
         description = 'Simple Photo Renaming Tool',
-        epilog = 'Example: ' + os.path.basename(sys.argv[0]) + ' ./DSCN6529.JPG')
+        epilog = 'Example: ' + os.path.basename(sys.argv[0])
+               + ' -d ../myphotos DSCN6529.JPG')
 
 options.add_option('-d', '--destdir', default="./", dest="destdir", type="string",
         action='store', help='destination directory')
