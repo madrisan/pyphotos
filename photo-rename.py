@@ -18,6 +18,8 @@ options = \
 
 options.add_option('-d', '--destdir', default="./", dest="destdir", type="string",
         action='store', help='destination directory')
+options.add_option('-f', '--force', default=False, dest="force",
+        action='store_true', help='overwrite any existing output file')
 options.add_option('-v', '--verbose', default=False, dest="verbose",
         action='store_true', help='switch to the verbose mode')
 
@@ -59,6 +61,11 @@ def main():
 
     if opts.verbose:
         print(imageFileSrc + ' --> ' + imageFileDst)
+
+    if (os.path.isfile(imageFileDst) and not opts.force):
+        sys.stderr.write(
+            'The destination file %s already exists\n' % imageFileDst)
+        sys.exit(1)
 
     try:
         shutil.move(imageFileSrc, imageFileDst)
