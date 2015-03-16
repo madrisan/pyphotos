@@ -40,11 +40,13 @@ def GetExifTags(fname):
 
     return ret
 
-def ForgeNewName(imageFile):
+def ForgeNewName(imageFile, destdir):
     fileName, fileExtension = os.path.splitext(imageFile)
+
     exifInfo = GetExifTags(imageFile)
+
     date, time = exifInfo['DateTime'].replace(':', '-').split()
-    return "%s_%s%s" % (date,time, fileExtension.lower())
+    return "%s/%s_%s%s" % (destdir, date,time, fileExtension.lower())
 
 def main():
     (opts, args) = options.parse_args()
@@ -52,14 +54,14 @@ def main():
         options.print_help()
         return
 
-    imageFile = args[0]
-    newFileName = ForgeNewName(imageFile)
+    imageFileSrc = args[0]
+    imageFileDst = ForgeNewName(imageFileSrc, opts.destdir)
 
     if opts.verbose:
-        print(imageFile + ' --> ' + opts.destdir + '/' + newFileName)
+        print(imageFileSrc + ' --> ' + imageFileDst)
 
     try:
-        shutil.move(imageFile, opts.destdir + '/' + newFileName)
+        shutil.move(imageFileSrc, imageFileDst)
     except Exception as e:
         sys.stderr.write('An IO error occurred: %s\n' % e)
         sys.exit(1)
