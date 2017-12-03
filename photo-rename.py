@@ -34,7 +34,7 @@ def get_args():
 
     return parser.parse_args()
 
-def GetExifTags(fname):
+def get_exif_tags(fname):
     """Get embedded EXIF data from image file."""
     ret = {}
     try:
@@ -53,10 +53,10 @@ def GetExifTags(fname):
 
     return ret
 
-def ForgeNewName(imageFile, destdir):
+def forge_new_name(imageFile, destdir):
     fileName, fileExtension = os.path.splitext(imageFile)
 
-    exifInfo = GetExifTags(imageFile)
+    exifInfo = get_exif_tags(imageFile)
 
     date, time = exifInfo['DateTime'].replace(':', '-').split()
     return "%s/%s_%s%s" % (destdir, date,time, fileExtension.lower())
@@ -65,7 +65,7 @@ def main():
     args = get_args()
     destdir = args.destdir if args.destdir else '.'
 
-    imageFileDst = ForgeNewName(args.imageFile, destdir)
+    imageFileDst = forge_new_name(args.imageFile, destdir)
 
     if args.verbose:
         print(args.imageFile + ' --> ' + imageFileDst)
