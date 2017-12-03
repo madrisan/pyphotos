@@ -6,29 +6,33 @@ from PIL.ExifTags import TAGS
 
 import argparse, errno, os, shutil, sys
 
-parser = argparse.ArgumentParser(
-    description = 'Simple photo renaming tool.',
-    epilog = 'example: ' + os.path.basename(sys.argv[0])
-           + ' -d ../myphotos DSCN6529.JPG')
-parser.add_argument(
-    "-d", "--destdir",
-    action = "store",
-    help   = "specify a destination directory",
-    dest   = "destdir")
-parser.add_argument(
-    "-f", "--force",
-    action = "store_true",
-    help   = "overwrite any existing output file",
-    dest   = "force")
-parser.add_argument(
-    "-v", "--verbose",
-    action = "store_true",
-    help   = "execute this script in verbose mode",
-    dest   = "verbose")
-parser.add_argument(
-    "--version", action = "version", version = "%(prog)s version 1")
-parser.add_argument(
-    "imageFile", help = "the image file to be renamed")
+def get_args():
+    '''This function parses and return arguments passed in'''
+    parser = argparse.ArgumentParser(
+                 description = 'Simple photo renaming tool.',
+                 epilog = 'example: ' + os.path.basename(sys.argv[0])
+                        + ' -d ../myphotos DSCN6529.JPG')
+    parser.add_argument(
+        "-d", "--destdir",
+        action = "store",
+        help   = "specify a destination directory",
+        dest   = "destdir")
+    parser.add_argument(
+        "-f", "--force",
+        action = "store_true",
+        help   = "overwrite any existing output file",
+        dest   = "force")
+    parser.add_argument(
+        "-v", "--verbose",
+        action = "store_true",
+        help   = "execute this script in verbose mode",
+        dest   = "verbose")
+    parser.add_argument(
+        "--version", action = "version", version = "%(prog)s version 1")
+    parser.add_argument(
+        "imageFile", help = "the image file to be renamed")
+
+    return parser.parse_args()
 
 def GetExifTags(fname):
     """Get embedded EXIF data from image file."""
@@ -58,7 +62,7 @@ def ForgeNewName(imageFile, destdir):
     return "%s/%s_%s%s" % (destdir, date,time, fileExtension.lower())
 
 def main():
-    args = parser.parse_args()
+    args = get_args()
     destdir = args.destdir if args.destdir else '.'
 
     imageFileDst = ForgeNewName(args.imageFile, destdir)
