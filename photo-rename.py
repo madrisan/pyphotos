@@ -5,16 +5,18 @@ from PIL import Image
 from PIL.ExifTags import TAGS
 
 import argparse
+import glob
 import os
 import shutil
 import sys
 
 def get_args():
     '''This function parses and return arguments passed in'''
+    progname = os.path.basename(sys.argv[0])
     parser = argparse.ArgumentParser(
                  description = 'Simple photo renaming tool.',
-                 epilog = 'example: ' + os.path.basename(sys.argv[0])
-                        + ' -d ~/Photos ~/Downloads/DSCN6529.JPG')
+                 epilog = ('examples:\n'
+                        + progname + ' -d ~/Photos ~/Downloads/*.JPG'))
     parser.add_argument(
         "-d", "--destdir",
         action = "store",
@@ -33,7 +35,7 @@ def get_args():
     parser.add_argument(
         "--version", action = "version", version = "%(prog)s version 1")
     parser.add_argument(
-        "image", help = "the image file to be renamed")
+        "images", help = "the image file(s) to be renamed")
 
     return parser.parse_args()
 
@@ -70,21 +72,23 @@ def forge_new_name(image, destdir):
 def main():
     args = get_args()
     destdir = args.destdir if args.destdir else '.'
-    destfile = forge_new_name(args.image, destdir)
+    images = glob.glob(args.images)
 
-    if args.verbose:
-        print(args.image + ' --> ' + destfile)
+    for image in images:
+        destfile = forge_new_name(image, destdir)
+        if args.verbose:
+            print(image + ' --> ' + destfile)
 
-    if (os.path.isfile(destfile) and not args.force):
-        sys.stderr.write(
-            'The destination file %s already exists\n' % destfile)
-        sys.exit(1)
+        if (os.path.isfile(destfile) and not args.force):
+            sys.stderr.write(
+                'The destination file exists, skipping {0}\n'.format(destfile))
+            continue
 
-    try:
-        shutil.move(args.image, destfile)
-    except Exception as e:
-        sys.stderr.write('An IO error occurred: %s\n' % e)
-        sys.exit(1)
+        try:
+            shutil.move(image, destfile)
+        except Exception as e:
+            sys.stderr.write('An IO error occurred: %s\n' % e)
+            continue
 
 if __name__ == '__main__':
     main()
