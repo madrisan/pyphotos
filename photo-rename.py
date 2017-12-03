@@ -11,7 +11,7 @@ def get_args():
     parser = argparse.ArgumentParser(
                  description = 'Simple photo renaming tool.',
                  epilog = 'example: ' + os.path.basename(sys.argv[0])
-                        + ' -d ../myphotos DSCN6529.JPG')
+                        + ' -d ~/Photos ~/Downloads/DSCN6529.JPG')
     parser.add_argument(
         "-d", "--destdir",
         action = "store",
