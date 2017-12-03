@@ -59,8 +59,9 @@ def ForgeNewName(imageFile, destdir):
 
 def main():
     args = parser.parse_args()
+    destdir = args.destdir if args.destdir else '.'
 
-    imageFileDst = ForgeNewName(args.imageFile, args.destdir)
+    imageFileDst = ForgeNewName(args.imageFile, destdir)
 
     if args.verbose:
         print(args.imageFile + ' --> ' + imageFileDst)
