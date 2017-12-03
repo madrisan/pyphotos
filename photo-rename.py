@@ -1,4 +1,7 @@
 #!/usr/bin/env python
+# A simple tool for renaming the photos created by a Nikon digital camera
+# into something more meaningful.
+# Copyright (C) 2015,2017 Davide Madrisan <davide.madrisan@gmail.com>
 
 from __future__ import print_function
 from PIL import Image
