@@ -4,7 +4,10 @@ from __future__ import print_function
 from PIL import Image
 from PIL.ExifTags import TAGS
 
-import argparse, errno, os, shutil, sys
+import argparse
+import os
+import shutil
+import sys
 
 def get_args():
     '''This function parses and return arguments passed in'''
