@@ -30,12 +30,12 @@ def get_args():
     parser.add_argument(
         "--version", action = "version", version = "%(prog)s version 1")
     parser.add_argument(
-        "imageFile", help = "the image file to be renamed")
+        "image", help = "the image file to be renamed")
 
     return parser.parse_args()
 
 def get_exif_tags(fname):
-    """Get embedded EXIF data from image file."""
+    '''Get embedded EXIF data from image file.'''
     ret = {}
     try:
         img = Image.open(fname)
@@ -53,30 +53,32 @@ def get_exif_tags(fname):
 
     return ret
 
-def forge_new_name(imageFile, destdir):
-    fileName, fileExtension = os.path.splitext(imageFile)
-
-    exifInfo = get_exif_tags(imageFile)
-
+def forge_new_name(image, destdir):
+    '''
+    Return the new filename and path, forged by using the exif data
+    contained in the image file ('DateTime').
+    Example: ~/Photos/2013-07-14_15-17-22.jpg
+    '''
+    fileName, fileExtension = os.path.splitext(image)
+    exifInfo = get_exif_tags(image)
     date, time = exifInfo['DateTime'].replace(':', '-').split()
     return "%s/%s_%s%s" % (destdir, date,time, fileExtension.lower())
 
 def main():
     args = get_args()
     destdir = args.destdir if args.destdir else '.'
-
-    imageFileDst = forge_new_name(args.imageFile, destdir)
+    destfile = forge_new_name(args.image, destdir)
 
     if args.verbose:
-        print(args.imageFile + ' --> ' + imageFileDst)
+        print(args.image + ' --> ' + destfile)
 
-    if (os.path.isfile(imageFileDst) and not args.force):
+    if (os.path.isfile(destfile) and not args.force):
         sys.stderr.write(
-            'The destination file %s already exists\n' % imageFileDst)
+            'The destination file %s already exists\n' % destfile)
         sys.exit(1)
 
     try:
-        shutil.move(args.imageFile, imageFileDst)
+        shutil.move(args.image, destfile)
     except Exception as e:
         sys.stderr.write('An IO error occurred: %s\n' % e)
         sys.exit(1)
