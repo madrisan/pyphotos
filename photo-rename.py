@@ -13,13 +13,13 @@ import os
 import shutil
 import sys
 
-def get_args():
+def parse_args():
     '''This function parses and return arguments passed in'''
     progname = os.path.basename(sys.argv[0])
     parser = argparse.ArgumentParser(
                  description = 'Simple photo renaming tool.',
                  epilog = ('examples:\n'
-                        + progname + ' -d ~/Photos ~/Downloads/*.JPG'))
+                        + progname + ' -d ~/Photos *.JPG myimage.jpg'))
     parser.add_argument(
         "-d", "--destdir",
         action = "store",
@@ -38,7 +38,9 @@ def get_args():
     parser.add_argument(
         "--version", action = "version", version = "%(prog)s version 1")
     parser.add_argument(
-        "images", help = "the image file(s) to be renamed")
+        "images",
+        nargs='+',
+        help = "the image file(s) to be renamed")
 
     return parser.parse_args()
 
@@ -73,9 +75,9 @@ def forge_new_name(image, destdir):
     return "%s/%s_%s%s" % (destdir, date,time, fileExtension.lower())
 
 def main():
-    args = get_args()
+    args = parse_args()
     destdir = args.destdir if args.destdir else '.'
-    images = glob.glob(args.images)
+    images = set([img for arg in args.images for img in glob.glob(arg)])
 
     for image in images:
         destfile = forge_new_name(image, destdir)
