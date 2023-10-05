@@ -1,13 +1,14 @@
 #!/usr/bin/env python
 # A simple tool for renaming the photos created by a Nikon digital camera
 # into something more meaningful.
-# Copyright (C) 2015,2017 Davide Madrisan <davide.madrisan@gmail.com>
+# Copyright (C) 2015,2017,2023 Davide Madrisan <davide.madrisan@gmail.com>
 
 from __future__ import print_function
 from PIL import Image
 from PIL.ExifTags import TAGS
 
 import argparse
+import errno
 import glob
 import os
 import shutil
@@ -78,6 +79,13 @@ def main():
     args = parse_args()
     destdir = args.destdir if args.destdir else '.'
     images = set([img for arg in args.images for img in glob.glob(arg)])
+
+    if not os.path.exists(destdir):
+        try:
+            os.makedirs(destdir)
+        except OSError as e:
+            if e.errno != errno.EEXIST:
+                raise
 
     for image in images:
         destfile = forge_new_name(image, destdir)
