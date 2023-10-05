@@ -96,9 +96,17 @@ def forge_new_name(image, destdir):
     contained in the image file ('DateTime').
     Example: ~/Photos/2013-07-14_15-17-22.jpg
     """
-    fileName, fileExtension = os.path.splitext(image)
-    exifInfo = get_exif_tags(image)
-    date, time = exifInfo["DateTime"].replace(":", "-").split()
+    try:
+        fileName, fileExtension = os.path.splitext(image)
+        exifInfo = get_exif_tags(image)
+        date, time = exifInfo["DateTime"].replace(":", "-").split()
+    except Exception as e:
+        sys.stderr.write(
+            "WARNING: A problem occurred while processing %s: %s: %s\n"
+            % (image, type(e).__name__, e)
+        )
+        return None
+
     return "%s/%s_%s%s" % (destdir, date, time, fileExtension.lower())
 
 
@@ -124,6 +132,9 @@ def main():
 
     for image in images:
         destfile = forge_new_name(image, destdir)
+        if not destfile:
+            continue
+
         if args.verbose:
             print(image + " --> " + destfile)
 
