@@ -32,6 +32,21 @@ def parse_args():
         help   = "overwrite any existing output file",
         dest   = "force")
     parser.add_argument(
+        "-H", "--hidden",
+        action = "store_true",
+        help   = "include hidden files and directories",
+        dest   = "hidden")
+    parser.add_argument(
+        "-m", "--move",
+        action = "store_true",
+        help   = "move files instead of copying them",
+        dest   = "move")
+    parser.add_argument(
+        "-r", "--recursive",
+        action = "store_true",
+        help   = "check files and directories recursively",
+        dest   = "recursive")
+    parser.add_argument(
         "-v", "--verbose",
         action = "store_true",
         help   = "execute this script in verbose mode",
@@ -78,7 +93,15 @@ def forge_new_name(image, destdir):
 def main():
     args = parse_args()
     destdir = args.destdir if args.destdir else '.'
-    images = set([img for arg in args.images for img in glob.glob(arg)])
+    images = set(
+        [
+            img
+            for arg in args.images
+            for img in glob.glob(
+                arg, include_hidden=args.hidden, recursive=args.recursive
+            )
+        ]
+    )
 
     if not os.path.exists(destdir):
         try:
@@ -98,7 +121,10 @@ def main():
             continue
 
         try:
-            shutil.move(image, destfile)
+            if args.move:
+                shutil.move(image, destfile)
+            else:
+                shutil.copy2(image, destfile)
         except Exception as e:
             sys.stderr.write('An IO error occurred: %s\n' % e)
             continue
