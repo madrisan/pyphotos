@@ -14,58 +14,68 @@ import os
 import shutil
 import sys
 
+
 def parse_args():
-    '''This function parses and return arguments passed in'''
+    """This function parses and return arguments passed in"""
     progname = os.path.basename(sys.argv[0])
     parser = argparse.ArgumentParser(
-                 description = 'Simple photo renaming tool.',
-                 epilog = ('examples:\n'
-                        + progname + ' -d ~/Photos *.JPG myimage.jpg'))
+        description="Simple photo renaming tool.",
+        epilog=("examples:\n" + progname + " -d ~/Photos *.JPG myimage.jpg"),
+    )
     parser.add_argument(
-        "-d", "--destdir",
-        action = "store",
-        help   = "specify a destination directory",
-        dest   = "destdir")
+        "-d",
+        "--destdir",
+        action="store",
+        help="specify a destination directory",
+        dest="destdir",
+    )
     parser.add_argument(
-        "-f", "--force",
-        action = "store_true",
-        help   = "overwrite any existing output file",
-        dest   = "force")
+        "-f",
+        "--force",
+        action="store_true",
+        help="overwrite any existing output file",
+        dest="force",
+    )
     parser.add_argument(
-        "-H", "--hidden",
-        action = "store_true",
-        help   = "include hidden files and directories",
-        dest   = "hidden")
+        "-H",
+        "--hidden",
+        action="store_true",
+        help="include hidden files and directories",
+        dest="hidden",
+    )
     parser.add_argument(
-        "-m", "--move",
-        action = "store_true",
-        help   = "move files instead of copying them",
-        dest   = "move")
+        "-m",
+        "--move",
+        action="store_true",
+        help="move files instead of copying them",
+        dest="move",
+    )
     parser.add_argument(
-        "-r", "--recursive",
-        action = "store_true",
-        help   = "check files and directories recursively",
-        dest   = "recursive")
+        "-r",
+        "--recursive",
+        action="store_true",
+        help="check files and directories recursively",
+        dest="recursive",
+    )
     parser.add_argument(
-        "-v", "--verbose",
-        action = "store_true",
-        help   = "execute this script in verbose mode",
-        dest   = "verbose")
-    parser.add_argument(
-        "--version", action = "version", version = "%(prog)s version 1")
-    parser.add_argument(
-        "images",
-        nargs='+',
-        help = "the image file(s) to be renamed")
+        "-v",
+        "--verbose",
+        action="store_true",
+        help="execute this script in verbose mode",
+        dest="verbose",
+    )
+    parser.add_argument("--version", action="version", version="%(prog)s version 1")
+    parser.add_argument("images", nargs="+", help="the image file(s) to be renamed")
 
     return parser.parse_args()
 
+
 def get_exif_tags(fname):
-    '''Get embedded EXIF data from image file.'''
+    """Get embedded EXIF data from image file."""
     ret = {}
     try:
         img = Image.open(fname)
-        if hasattr(img, '_getexif'):
+        if hasattr(img, "_getexif"):
             exifinfo = img._getexif()
             if exifinfo != None:
                 for tag, value in exifinfo.items():
@@ -73,26 +83,28 @@ def get_exif_tags(fname):
                     ret[decoded] = value
     except:
         sys.stderr.write(
-            '%s cannot be found, or the image cannot be opened and identified\n'
-            % fname)
+            "%s cannot be found, or the image cannot be opened and identified\n" % fname
+        )
         sys.exit(1)
 
     return ret
 
+
 def forge_new_name(image, destdir):
-    '''
+    """
     Return the new filename and path, forged by using the exif data
     contained in the image file ('DateTime').
     Example: ~/Photos/2013-07-14_15-17-22.jpg
-    '''
+    """
     fileName, fileExtension = os.path.splitext(image)
     exifInfo = get_exif_tags(image)
-    date, time = exifInfo['DateTime'].replace(':', '-').split()
-    return "%s/%s_%s%s" % (destdir, date,time, fileExtension.lower())
+    date, time = exifInfo["DateTime"].replace(":", "-").split()
+    return "%s/%s_%s%s" % (destdir, date, time, fileExtension.lower())
+
 
 def main():
     args = parse_args()
-    destdir = args.destdir if args.destdir else '.'
+    destdir = args.destdir if args.destdir else "."
     images = set(
         [
             img
@@ -113,11 +125,12 @@ def main():
     for image in images:
         destfile = forge_new_name(image, destdir)
         if args.verbose:
-            print(image + ' --> ' + destfile)
+            print(image + " --> " + destfile)
 
-        if (os.path.isfile(destfile) and not args.force):
+        if os.path.isfile(destfile) and not args.force:
             sys.stderr.write(
-                'The destination file exists, skipping {0}\n'.format(destfile))
+                "The destination file exists, skipping {0}\n".format(destfile)
+            )
             continue
 
         try:
@@ -126,8 +139,9 @@ def main():
             else:
                 shutil.copy2(image, destfile)
         except Exception as e:
-            sys.stderr.write('An IO error occurred: %s\n' % e)
+            sys.stderr.write("An IO error occurred: %s\n" % e)
             continue
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()
